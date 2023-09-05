@@ -1,14 +1,12 @@
-#ifndef LIST_H
-#define LIST_H
-
-#include <stdlib.h>
+#ifndef LISTS_H
+#define LISTS_H
 
 /**
- * struct listint_s - Singly linked list
- * @n: Integer
- * @next: Points to the next node
+ * struct listint_s - singly linked list
+ * @n: integer
+ * @next: points to the next node
  *
- * Description: Singly linked list node structure
+ * Description: singly linked list node structure
  *
  */
 typedef struct listint_s
@@ -23,4 +21,4 @@ void free_listint(listint_t *head);
 
 listint_t *insert_node(listint_t **head, int number);
 
-#endif 
+#endif /* LISTS_H */
