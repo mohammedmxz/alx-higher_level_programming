@@ -1,13 +1,12 @@
 #!/usr/bin/python3
 
 def square_matrix_simple(matrix=[]):
-    # Create a new matrix with the same size as the input matrix
-    result = [[0 for _ in range(len(matrix[0]))] for _ in range(len(matrix))]
+ # create a new matrix with the same size
+    new_matrix = [[0 for col in row] for row in matrix]
     
-    # Iterate over each element in the input matrix
-    for i in range(len(matrix)):
-        for j in range(len(matrix[i])):
-            # Square the value of each element and store it in the corresponding position of the result matrix
-            result[i][j] = matrix[i][j] ** 2
-    
-    return result
+    # iterate through the matrix
+    for row in range(len(matrix)):
+        for col in range(len(matrix[row])):
+            new_matrix[row][col] = matrix[row][col] ** 2
+            
+    return new_matrix
