@@ -1,22 +1,23 @@
 #!/usr/bin/python3
-""" Geometry utility """
-
-Rectangle = __import__("9-rectangle").Rectangle
+'''Module class Square'''
+Rectangle = __import__('9-rectangle').Rectangle
 
 
 class Square(Rectangle):
-    """ A square utility class """
-    def __init__(self, size):
+    """
+    This class inherits from Rectangle and represents a square.
+    """
+    def __init__(self, size) -> None:
         """
-        Square constructor
+        Intialize a new Square.
 
         Args:
-            size (int): the size of the square
+            size(int): The sides of the new Square.
         """
-        super().integer_validator("size", size)
+        self.integer_validator("size", size)
         super().__init__(size, size)
         self.__size = size
 
-    def area(self):
-        """ Calculates the area of a square """
-        return self.__size ** 2
+    def __str__(self) -> str:
+        """returns string representation of Square"""
+        return "[Square] {}/{}".format(self.__size, self.__size)
