@@ -1,189 +1,101 @@
 #!/usr/bin/python3
-"""
-This module defines a class Base
-"""
-import json
-import csv
-from os import path
+""" This module defines a test class for the Base class """
+import unittest
+from models.base import Base
+from models.rectangle import Rectangle
+from models.square import Square
+from os.path import isfile
 
 
-class Base():
-    """ A base class """
-    __nb_objects = 0
+class TestBase(unittest.TestCase):
 
-    def __init__(self, id=None):
-        """
-        Constructor for base class
+    def test_single_obj_with_id(self):
+        base = Base(10)
+        self.assertEqual(10, base.id)
 
-        Args:
-            id (int): Unique ID for the object
-        """
-        if id:
-            self.id = id
-        else:
-            Base.__nb_objects += 1
-            self.id = Base.__nb_objects
+    def test_single_obj_without_id(self):
+        base = Base()
+        self.assertEqual(7, base.id)
 
-    @staticmethod
-    def to_json_string(list_dictionaries):
-        """
-        Get the the JSON string representation of list_dictionaries
+    def test_two_obj_with_id(self):
+        base = Base(10)
+        base2 = Base(5)
+        self.assertEqual(5, base2.id)
 
-        Args:
-            list_dictionaries (list[dict]): a list of dictionaries
+    def test_two_obj_with_first_id(self):
+        base = Base(5)
+        base2 = Base()
+        self.assertEqual(9, base2.id)
 
-        Returns:
-            str: JSON strig representation of @list_dictionaries
-        """
-        if type(list_dictionaries) is not None and not list:
-            raise TypeError()
+    def test_two_obj_with_second_id(self):
+        base = Base()
+        base2 = Base(3)
+        self.assertEqual(3, base2.id)
 
-        if list_dictionaries:
-            for item in list_dictionaries:
-                if type(item) is not dict:
-                    raise TypeError()
+    def test_two_obj_without_ids(self):
+        base = Base()
+        base2 = Base()
+        self.assertEqual(12, base2.id)
 
-            return json.dumps(list_dictionaries)
+    def test_single_obj_with_neg_id(self):
+        base = Base(-5)
+        self.assertEqual(-5, base.id)
 
-        return "[]"
+    def test_two_obj_with_neg_ids(self):
+        base = Base(-1)
+        base2 = Base(-2)
+        self.assertEqual(-2, base2.id)
 
-    @classmethod
-    def save_to_file(cls, list_objs):
-        """
-        Writes the JSON string representation of list_objs to a file
+    def test_to_json_string_with_valid_dictionary(self):
+        rect = Rectangle(10, 7, 2, 8, 1)
+        dictionary = rect.to_dictionary()
+        json_dictionary = Base.to_json_string([dictionary])
+        self.assertEqual(sorted('[{"x": 2, "width": 10, "id": 1, "height": 7'
+                                ', "y": 8}]'), sorted(json_dictionary))
 
-        Args:
-            list_objs: A list of instances who inherits of Base
-        """
-        list_dictionaries = []
-        filename = cls.__name__ + ".json"
+    def test_to_json_string_with_argument_none(self):
+        json_string = Base.to_json_string(None)
+        self.assertEqual("[]", json_string)
 
-        if list_objs is not None:
-            if len(list_objs) != 0:
-                for item in list_objs:
-                    list_dictionaries.append(item.to_dictionary())
+    def test_to_json_string_with_empty_dictionary(self):
+        json_string = Base.to_json_string({})
+        self.assertEqual("[]", json_string)
 
-        with open(filename, mode="w") as file:
-            file.write(Base.to_json_string(list_dictionaries))
+    def test_from_json_string_from_valid_string(self):
+        list_input = [
+            {'id': 89, 'width': 10, 'height': 4},
+            {'id': 7, 'width': 1, 'height': 7}
+        ]
+        json_str = Rectangle.to_json_string(list_input)
+        output = Rectangle.from_json_string(json_str)
+        self.assertEqual(list_input, output)
 
-        if list_objs is None or list_objs == []:
-            return "[]"
+    def test_from_json_string_from_none(self):
+        output = Rectangle.from_json_string(None)
+        self.assertEqual([], output)
 
-    @staticmethod
-    def from_json_string(json_string):
-        """
-        Gets the list of the JSON string representation json_string
+    def test_from_json_string_from_empty(self):
+        output = Rectangle.from_json_string("")
+        self.assertEqual([], output)
 
-        Args:
-            json_string: A string representing a list of dictionaries.
+    def test_create_rectangle(self):
+        rect = Rectangle(3, 5, 1, 1)
+        obj_dict = rect.to_dictionary()
+        rect2 = Rectangle.create(**obj_dict)
+        self.assertEqual("[Rectangle] (1) 1/1 - 3/5", str(rect2))
 
-        Returns:
-            The list of the JSON string representation json_string
-        """
-        if type(json_string) is not None and not str:
-            raise TypeError()
+    def test_create_square(self):
+        square = Square(3, 5, 1, 1)
+        obj_dict = square.to_dictionary()
+        square2 = Square.create(**obj_dict)
+        self.assertEqual("[Square] (1) 5/1 - 3", str(square2))
 
-        if json_string:
-            return json.loads(json_string)
-        return []
+    def test_rectangle_load_from_file(self):
+        Rectangle.save_to_file([Rectangle(10, 7, 2, 8, 1), Rectangle(2, 4)])
+        actual = Rectangle.load_from_file()
+        self.assertEqual(2, len(actual))
 
-    @classmethod
-    def create(cls, **dictionary):
-        """
-        Creates an instance with all attributes already set
-
-        Args:
-            dictionary (kwargs): Values to be used to set all attributes
-
-        Returns:
-           object: an instance of a class
-        """
-        if cls.__name__ == "Rectangle":
-            obj = cls(4, 3)
-        elif cls.__name__ == "Square":
-            obj = cls(4)
-        obj.update(**dictionary)
-        return obj
-
-    @classmethod
-    def load_from_file(cls):
-        """
-        Gets list of instances
-
-        Returns:
-            list: list of instances
-        """
-        list_instances = []
-        filename = cls.__name__ + ".json"
-        if path.isfile(filename):
-            with open(filename, mode="r", encoding="utf-8") as file:
-                list_dict = cls.from_json_string(file.read())
-                for item in list_dict:
-                    list_instances.append(cls.create(**item))
-        return list_instances
-
-    @classmethod
-    def save_to_file_csv(cls, list_objs):
-        """
-        Serialize CSV
-
-        Args:
-            list_objs: list of instances of Base class
-        """
-        if type(list_objs) is not None and not list:
-            raise TypeError()
-
-        filename = cls.__name__ + ".csv"
-
-        if list_objs:
-            with open(filename, mode="w", encoding="utf-8") as file:
-                writer = csv.writer(file)
-
-                for item in list_objs:
-                    if not isinstance(item, cls):
-                        raise TypeError()
-
-                    li = []
-                    li.append(item.id)
-
-                    if type(item).__name__ == "Rectangle":
-                        li.append(item.width)
-                        li.append(item.height)
-                    elif type(item).__name__ == "Square":
-                        li.append(item.size)
-
-                    li.append(item.x)
-                    li.append(item.y)
-                    writer.writerow(li)
-
-    @classmethod
-    def load_from_file_csv(cls):
-        """
-        Deserialize CSV file
-
-        Return:
-            list:list of instances
-        """
-        filename = cls.__name__ + ".csv"
-        list_instances = []
-
-        if path.isfile(filename):
-            with open(filename, mode="r", encoding="utf8") as file:
-                reader = csv.reader(file)
-
-                for row in reader:
-                    d = {}
-                    d["id"] = int(row[0])
-
-                    if cls.__name__ == "Rectangle":
-                        d["width"] = int(row[1])
-                        d["height"] = int(row[2])
-                        d["x"] = int(row[3])
-                        d["y"] = int(row[4])
-                    elif cls.__name__ == "Square":
-                        d["size"] = int(row[1])
-                        d["x"] = int(row[2])
-                        d["y"] = int(row[3])
-
-                    list_instances.append(cls.create(**d))
-        return list_instances
+    def test_square_load_from_file(self):
+        Square.save_to_file([Square(5, 1, 1, 1)])
+        actual = Square.load_from_file()
+        self.assertEqual(1, len(actual))

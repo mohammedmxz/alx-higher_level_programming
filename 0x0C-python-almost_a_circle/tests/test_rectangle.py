@@ -1,192 +1,183 @@
 #!/usr/bin/python3
-"""
-This module defines a Rectangle class.
-"""
-from .base import Base
+""" This module defines a test class for the Rectangle class """
+import unittest
+from models.rectangle import Rectangle
+from os.path import isfile
 
 
-class Rectangle(Base):
-    """
-    A rectangle class.
-    """
-    def __init__(self, width, height, x=0, y=0, id=None):
-        """
-        Constructor for the Rectangle class.
+class TestRectangle(unittest.TestCase):
 
-        Args:
-            width (int): The width of the rectangle.
-            height (int): The height of the rectangle.
-        """
-        super().__init__(id)
-        self.width = width
-        self.height = height
-        self.x = x
-        self.y = y
+    def test_width_from_valid_values_with_id(self):
+        rect = Rectangle(10, 5, 1, 1, 10)
+        self.assertEqual(10, rect.width)
 
-    def __str__(self):
-        """
-        Gets details about Rectangle.
+    def test_height_from_valid_values_with_id(self):
+        rect = Rectangle(10, 5, 1, 1, 10)
+        self.assertEqual(5, rect.height)
 
-        Returns:
-            str: Details about a the Rectangle class.
-        """
-        fmt = "[Rectangle] ({}) {}/{} - {}/{}"
-        return fmt.format(self.id, self.x, self.y, self.width, self.height)
+    def test_x_from_valid_values_with_id(self):
+        rect = Rectangle(10, 5, 1, 1, 10)
+        self.assertEqual(1, rect.x)
 
-    @property
-    def width(self):
-        """
-        Retrieves the width of the rectangle.
+    def test_y_from_valid_values_with_id(self):
+        rect = Rectangle(10, 5, 1, 1, 10)
+        self.assertEqual(1, rect.y)
 
-        Returns:
-            int: The value of the width of the triangle.
-        """
-        return self.__width
+    def test_id_from_valid_values_with_id(self):
+        rect = Rectangle(10, 5, 1, 1, 10)
+        self.assertEqual(10, rect.id)
 
-    @width.setter
-    def width(self, value):
-        """
-        Sets the width value of the rectangle.
+    def test_width_from_invalid_type(self):
+        with self.assertRaises(TypeError):
+            rect = Rectangle("10", 5, 1, 1, 10)
 
-        Args:
-            value (int): The value for the width of the rectangle.
-        """
-        if type(value) is not int:
-            raise TypeError("width must be an integer")
-        if value <= 0:
-            raise ValueError("width must be > 0")
-        self.__width = value
+    def test_height_from_invalid_type(self):
+        with self.assertRaises(TypeError):
+            rect = Rectangle(10, "5", 1, 1, 10)
 
-    @property
-    def height(self):
-        """
-        Retrieves the height of the rectangle.
+    def test_x_from_invalid_x(self):
+        with self.assertRaises(TypeError):
+            rect = Rectangle(10, 5, "1", 1, 10)
 
-        Returns:
-            int: The value of the height of the rectangle.
-        """
-        return self.__height
+    def test_y_from_invalid_y(self):
+        with self.assertRaises(TypeError):
+            rect = Rectangle(10, 5, 1, "1", 10)
 
-    @height.setter
-    def height(self, value):
-        """
-        Sets the height value of the rectangle.
+    def test_id_without_obj_id(self):
+        rect = Rectangle(10, 5, 1, 1)
+        self.assertEqual(14, rect.id)
 
-        Args:
-            value (int): The value of the height of the rectangle.
-        """
-        if type(value) is not int:
-            raise TypeError("height must be an integer")
-        if value <= 0:
-            raise ValueError("height must be > 0")
-        self.__height = value
+    def test_width_from_invalid_value(self):
+        with self.assertRaises(ValueError):
+            rect = Rectangle(-10, 5, 1, 1, 10)
 
-    @property
-    def x(self):
-        """
-        Retrieves the value of x.
+    def test_width_from_zero_value(self):
+        with self.assertRaises(ValueError):
+            rect = Rectangle(0, 5, 1, 1, 1)
 
-        Returns:
-            int: The value of x.
-        """
-        return self.__x
+    def test_height_from_zero_value(self):
+        with self.assertRaises(ValueError):
+            rect = Rectangle(10, 0, 1, 1, 10)
 
-    @x.setter
-    def x(self, value):
-        """
-        Sets the value of x.
+    def test_height_from_negative_value(self):
+        with self.assertRaises(ValueError):
+            rect = Rectangle(10, -1)
 
-        Args:
-            value (int): The value used to set x.
-        """
-        if type(value) is not int:
-            raise TypeError("x must be an integer")
-        if value < 0:
-            raise ValueError("x must be >= 0")
-        self.__x = value
+    def test_x_from_invalid_value(self):
+        with self.assertRaises(ValueError):
+            rect = Rectangle(10, 5, -1, 1, 10)
 
-    @property
-    def y(self):
-        """
-        Retrieves the value of y.
+    def test_y_from_invalid_value(self):
+        with self.assertRaises(ValueError):
+            rect = Rectangle(10, 5, 1, -1, 10)
 
-        Returns:
-            int: The value of y.
-        """
-        return self.__y
+    def test_one_positional_arg_provided(self):
+        with self.assertRaises(TypeError):
+            rect = Rectangle(10)
 
-    @y.setter
-    def y(self, value):
-        """
-        Sets the value of y.
+    def test_no_positional_arg_provided(self):
+        with self.assertRaises(TypeError):
+            rect = Rectangle()
 
-        Args:
-            value (int): The value used to set y.
-        """
-        if type(value) is not int:
-            raise TypeError("y must be an integer")
-        if value < 0:
-            raise ValueError("y must be >= 0")
-        self.__y = value
+    def test_area(self):
+        rect = Rectangle(10, 5, 1, 1, 10)
+        self.assertEqual(50, rect.area())
 
-    def area(self):
-        """
-        Calculates the area value of a rectangle
+    def test_display_nno_padding(self):
+        rect = Rectangle(1, 1, 0, 0, 10)
+        self.assertTrue(rect.display())
 
-        Return:
-            int: the area of a rectangle
-        """
-        return self.width * self.height
+    def test_magic_str_with_valid_values(self):
+        rect = Rectangle(10, 5, 1, 1, 10)
+        self.assertEqual("[Rectangle] (10) 1/1 - 10/5", str(rect))
 
-    def display(self):
-        """
-        Prints a rectangle with the character #
-        """
-        print("{}".format(
-            (("\n" * self.y) + ((" " * self.x) + ("#" * self.width) + "\n")
-             * self.height)), end="")
+    def test_magic_str_without_axis_nor_id(self):
+        rect = Rectangle(10, 5)
+        self.assertEqual("[Rectangle] (15) 0/0 - 10/5", str(rect))
 
-        return True
+    def test_magic_str_without_id(self):
+        rect = Rectangle(10, 5, 1, 1)
+        self.assertEqual("[Rectangle] (16) 1/1 - 10/5", str(rect))
 
-    def update(self, *args, **kwargs):
-        """
-        Update fields in Rectangle class
+    def test_display_with_padding(self):
+        rect = Rectangle(1, 1, 1, 1, 10)
+        self.assertTrue(rect.display())
 
-        Args:
-            args (tuple): Values used to update the fields in Rectangle class
-        """
-        if len(args) > 0 and type(args[0]) is int:
-            try:
-                self.id = args[0]
-            except IndexError:
-                pass
-            try:
-                self.width = args[1]
-            except IndexError:
-                pass
-            try:
-                self.height = args[2]
-            except IndexError:
-                pass
-            try:
-                self.x = args[3]
-            except IndexError:
-                pass
-            try:
-                self.y = args[4]
-            except IndexError:
-                pass
-        else:
-            for key, value in kwargs.items():
-                if hasattr(self, key):
-                    setattr(self, key, value)
+    def test_update_with_one_arg(self):
+        rect = Rectangle(10, 10, 10, 10)
+        rect.update(89)
+        self.assertEqual("[Rectangle] (89) 10/10 - 10/10", str(rect))
 
-    def to_dictionary(self):
-        """
-        Gets the dictionary representation of a Rectangle
+    def test_update_with_two_args(self):
+        rect = Rectangle(10, 10, 10, 10)
+        rect.update(89, 2)
+        self.assertEqual("[Rectangle] (89) 10/10 - 2/10", str(rect))
 
-        Returns:
-            dict: the dictionary representation of a Rectangle
-        """
-        return {'x': self.x, 'y': self.y, 'id': self.id,
-                'height': self.height, 'width': self.width}
+    def test_update_with_three_args(self):
+        rect = Rectangle(10, 10, 10, 10)
+        rect.update(89, 2, 3)
+        self.assertEqual("[Rectangle] (89) 10/10 - 2/3", str(rect))
+
+    def test_update_with_four_args(self):
+        rect = Rectangle(10, 10, 10, 10)
+        rect.update(89, 2, 3, 4)
+        self.assertEqual("[Rectangle] (89) 4/10 - 2/3", str(rect))
+
+    def test_update_with_five_args(self):
+        rect = Rectangle(10, 10, 10, 10)
+        rect.update(89, 2, 3, 4, 5)
+        self.assertEqual("[Rectangle] (89) 4/5 - 2/3", str(rect))
+
+    def test_update_with_one_args_and_kwargs(self):
+        rect = Rectangle(10, 10, 10, 10)
+        rect.update(5, width=990)
+        self.assertEqual("[Rectangle] (5) 10/10 - 10/10", str(rect))
+
+    def test_update_with_empty_args_and_one_kwargs(self):
+        rect = Rectangle(10, 10, 10, 10)
+        rect.update((), width=990)
+        self.assertEqual("[Rectangle] (20) 10/10 - 990/10", str(rect))
+
+    def test_update_with_empty_args_and_two_kwargs(self):
+        rect = Rectangle(10, 10, 10, 10)
+        rect.update((), width=990, id=1)
+        self.assertEqual("[Rectangle] (1) 10/10 - 990/10", str(rect))
+
+    def test_update_with_two_args_and_one_kwargs(self):
+        rect = Rectangle(10, 10, 10, 10)
+        rect.update(4, 5, width=990)
+        self.assertEqual("[Rectangle] (4) 10/10 - 5/10", str(rect))
+
+    def test_update_with_all_args_and_all_kwargs(self):
+        rect = Rectangle(10, 10, 10, 10)
+        rect.update(1, 1, 1, 1, 1, id=19, width=19, height=19, x=19, y=19)
+        self.assertEqual("[Rectangle] (1) 1/1 - 1/1", str(rect))
+
+    def test_to_dictionary_with_all_attributes_present(self):
+        rect = Rectangle(10, 2, 1, 1, 1)
+        actual = rect.to_dictionary()
+        self.assertEqual({"id": 1, "width": 10, "height": 2, "x": 1,
+                         "y": 1}, actual)
+
+    def test_to_dictionary_with_only_width_and_height_specified(self):
+        rect = Rectangle(10, 2)
+        actual = rect.to_dictionary()
+        self.assertEqual({"id": 18, "width": 10, "height": 2, "x": 0,
+                         "y": 0}, actual)
+
+    def test_to_dictionary_with_no_id_specified(self):
+        rect = Rectangle(10, 2, 9, 9)
+        actual = rect.to_dictionary()
+        self.assertEqual({"id": 17, "width": 10, "height": 2, "x": 9,
+                         "y": 9}, actual)
+
+    def test_save_to_file_with_none(self):
+        expected = Rectangle.save_to_file(None)
+        self.assertEqual("[]", expected)
+
+    def test_save_to_file_with_empty_list(self):
+        Rectangle.save_to_file([])
+        self.assertTrue(isfile("Rectangle.json"))
+        with open("Rectangle.json", mode="r") as file:
+            output = file.read()
+            self.assertEqual("[]", output)
